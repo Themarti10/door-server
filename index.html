@@ -17,9 +17,9 @@ async function fetchEvents() {
   list.innerHTML = '';
 
   data.forEach(e => {
-    // Принудительно переводим на русский язык
-    let date = new Date(e.timestamp);
-    let formatted = date.toLocaleString('ru-RU', {
+    // Парсим ISO дату и форматируем на русский
+    const date = new Date(e.timestamp);
+    const formatted = date.toLocaleString('ru-RU', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -34,6 +34,7 @@ async function fetchEvents() {
   });
 }
 
+// Обновляем каждые 2 секунды
 setInterval(fetchEvents, 2000);
 fetchEvents();
 </script>
