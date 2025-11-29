@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Door Monitor</title>
+</head>
+<body>
+<h1>Door Events</h1>
+<ul id="events"></ul>
+
+<script>
+async function fetchEvents() {
+  const res = await fetch('/events');
+  const data = await res.json();
+
+  const list = document.getElementById('events');
+  list.innerHTML = '';
+  data.forEach(e => {
+    const li = document.createElement('li');
+    li.textContent = `${e.timestamp} - Door: ${e.door ? 'Open' : 'Closed'}`;
+    list.appendChild(li);
+  });
+}
+
+setInterval(fetchEvents, 2000);
+fetchEvents();
+</script>
+</body>
+</html>
