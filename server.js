@@ -5,25 +5,29 @@ const path = require("path");
 const app = express();
 const port = process.env.PORT || 3000;
 
-// чтобы сервер понимал JSON
 app.use(bodyParser.json());
-
-// чтобы отдавать index.html и файлы
 app.use(express.static(path.join(__dirname)));
 
-let eventLog = []; // сюда будут складываться события
+let eventLog = [];
 
-// маршрут для ESP32
+// POST от ESP32
 app.post("/api", (req, res) => {
   const { door } = req.body;
-  const timestamp = new Date().toLocaleString();
+  const timestamp = new Date().toLocaleString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
   const event = { door, timestamp };
   eventLog.push(event);
-  console.log("Received event:", event);
+  console.log("Получено событие:", event);
   res.json({ status: "ok" });
 });
 
-// маршрут для фронтенда
+// GET для фронтенда
 app.get("/events", (req, res) => {
   res.json(eventLog);
 });
