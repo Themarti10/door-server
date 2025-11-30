@@ -13,11 +13,21 @@ let eventLog = [];
 // POST от ESP32
 app.post("/api", (req, res) => {
   const { door } = req.body;
-  // Отправляем ISO-формат, чтобы браузер корректно парсил
-  const timestamp = new Date().toISOString();
-  const event = { door, timestamp };
+
+  // Время сразу в нужном формате (Казахстан, русский язык)
+  const time = new Date().toLocaleString("ru-RU", {
+    timeZone: "Asia/Almaty",
+    hour12: false
+  });
+
+  const event = { 
+    door,
+    time 
+  };
+
   eventLog.push(event);
   console.log("Получено событие:", event);
+
   res.json({ status: "ok" });
 });
 
