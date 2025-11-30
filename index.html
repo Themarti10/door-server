@@ -1,42 +1,107 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>Монитор двери</title>
+  <meta charset="UTF-8" />
+  <title>События двери</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #e5e5e5;
+    }
+
+    header {
+      padding: 20px;
+      text-align: center;
+      font-size: 26px;
+      font-weight: bold;
+      background: #1e1e1e;
+      border-bottom: 1px solid #333;
+    }
+
+    #events {
+      max-width: 700px;
+      margin: 20px auto;
+      padding: 0 15px;
+    }
+
+    .event {
+      background: #1e1e1e;
+      padding: 15px;
+      margin-bottom: 12px;
+      border-radius: 10px;
+      border-left: 5px solid #3a8ef6;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    }
+
+    .event-time {
+      font-size: 14px;
+      color: #aaa;
+      margin-bottom: 5px;
+    }
+
+    .event-text {
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    .open {
+      border-left-color: #4caf50;
+    }
+
+    .close {
+      border-left-color: #f44336;
+    }
+  </style>
 </head>
+
 <body>
-<h1>События двери</h1>
-<ul id="events"></ul>
+  <header>События двери</header>
 
-<script>
-async function fetchEvents() {
-  const res = await fetch('/events');
-  const data = await res.json();
+  <div id="events">Загрузка...</div>
 
-  const list = document.getElementById('events');
-  list.innerHTML = '';
+  <script>
+    async function loadEvents() {
+      try {
+        const res = await fetch("/events");
+        const data = await res.json();
 
-  data.forEach(e => {
-    // Парсим ISO дату и форматируем на русский
-    const date = new Date(e.timestamp);
-    const formatted = date.toLocaleString('ru-RU', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    });
+        const container = document.getElementById("events");
+        container.innerHTML = "";
 
-    const li = document.createElement('li');
-    li.textContent = `${formatted} — Дверь: ${e.door ? 'Открыта' : 'Закрыта'}`;
-    list.appendChild(li);
-  });
-}
+        if (!data.length) {
+          container.innerHTML = "Пока нет событий.";
+          return;
+        }
 
-// Обновляем каждые 2 секунды
-setInterval(fetchEvents, 2000);
-fetchEvents();
-</script>
+        data.forEach(ev => {
+          const card = document.createElement("div");
+          card.className = "event " + (ev.state === "open" ? "open" : "close");
+
+          const time = document.createElement("div");
+          time.className = "event-time";
+          time.textContent = ev.time;
+
+          const text = document.createElement("div");
+          text.className = "event-text";
+          text.textContent = "Дверь: " + (ev.state === "open" ? "Открыта" : "Закрыта");
+
+          card.appendChild(time);
+          card.appendChild(text);
+          container.appendChild(card);
+        });
+
+      } catch (err) {
+        document.getElementById("events").innerHTML =
+          "Ошибка загрузки данных.";
+      }
+    }
+
+    loadEvents();
+    setInterval(loadEvents, 3000);
+  </script>
 </body>
 </html>
