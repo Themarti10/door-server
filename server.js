@@ -12,15 +12,9 @@ let eventLog = [];
 
 // POST от ESP32
 app.post("/api", (req, res) => {
-  let { door } = req.body;
-
-  // Преобразуем текст в boolean, если приходит строка
-  if (typeof door === "string") {
-    door = door.toLowerCase() === "открыта" || door.toLowerCase() === "true";
-  }
-
-  const timestamp = new Date().toISOString();
-  const event = { door, timestamp };
+  const { door } = req.body;
+  const timestamp = new Date().toISOString(); // ISO формат
+  const event = { door: door ? "Открыта" : "Закрыта", timestamp };
   eventLog.push(event);
   console.log("Получено событие:", event);
   res.json({ status: "ok" });
