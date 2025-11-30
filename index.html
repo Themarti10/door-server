@@ -77,26 +77,31 @@
           return;
         }
 
+        // Сортировка: новые события сверху
+        data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
         data.forEach(ev => {
           const card = document.createElement("div");
-          card.className = "event " + (ev.state === "open" ? "open" : "close");
+          card.className = "event " + (ev.door ? "open" : "close"); // true = открыта, false = закрыта
 
           const time = document.createElement("div");
           time.className = "event-time";
 
-          const date = new Date(ev.time);
-          time.textContent = date.toLocaleString('ru-RU', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
+          // Время на час назад
+          const date = new Date(ev.timestamp);
+          date.setHours(date.getHours() - 1);
+          time.textContent = date.toLocaleString("ru-RU", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
           });
 
           const text = document.createElement("div");
           text.className = "event-text";
-          text.textContent = "Дверь: " + (ev.state === "open" ? "Открыта" : "Закрыта");
+          text.textContent = "Дверь: " + (ev.door ? "Открыта" : "Закрыта");
 
           card.appendChild(time);
           card.appendChild(text);
@@ -106,11 +111,12 @@
       } catch (err) {
         document.getElementById("events").innerHTML =
           "Ошибка загрузки данных.";
+        console.error(err);
       }
     }
 
     loadEvents();
-    setInterval(loadEvents, 2000);
+    setInterval(loadEvents, 3000);
   </script>
 </body>
 </html>
