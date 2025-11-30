@@ -1,66 +1,22 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>События двери</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #121212;
-      color: #e5e5e5;
-    }
-
-    header {
-      padding: 20px;
-      text-align: center;
-      font-size: 26px;
-      font-weight: bold;
-      background: #1e1e1e;
-      border-bottom: 1px solid #333;
-    }
-
-    #events {
-      max-width: 700px;
-      margin: 20px auto;
-      padding: 0 15px;
-    }
-
-    .event {
-      background: #1e1e1e;
-      padding: 15px;
-      margin-bottom: 12px;
-      border-radius: 10px;
-      border-left: 5px solid #3a8ef6;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.25);
-    }
-
-    .event-time {
-      font-size: 14px;
-      color: #aaa;
-      margin-bottom: 5px;
-    }
-
-    .event-text {
-      font-size: 18px;
-      font-weight: 500;
-    }
-
-    .open {
-      border-left-color: #4caf50;
-    }
-
-    .close {
-      border-left-color: #f44336;
-    }
+    body { margin:0; font-family:Arial,sans-serif; background:#121212; color:#e5e5e5; }
+    header { padding:20px; text-align:center; font-size:26px; font-weight:bold; background:#1e1e1e; border-bottom:1px solid #333; }
+    #events { max-width:700px; margin:20px auto; padding:0 15px; }
+    .event { background:#1e1e1e; padding:15px; margin-bottom:12px; border-radius:10px; border-left:5px solid #3a8ef6; box-shadow:0 3px 10px rgba(0,0,0,0.25); }
+    .event-time { font-size:14px; color:#aaa; margin-bottom:5px; }
+    .event-text { font-size:18px; font-weight:500; }
+    .open { border-left-color:#4caf50; }
+    .close { border-left-color:#f44336; }
   </style>
 </head>
-
 <body>
   <header>События двери</header>
-
   <div id="events">Загрузка...</div>
 
   <script>
@@ -77,46 +33,39 @@
           return;
         }
 
-        // Сортировка: новые события сверху
-        data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        // Новые события сверху
+        data.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
 
-        data.forEach(ev => {
-          const card = document.createElement("div");
-          card.className = "event " + (ev.door ? "open" : "close"); // true = открыта, false = закрыта
+        data.forEach(ev=>{
+          const card=document.createElement("div");
+          card.className="event "+(ev.door?"open":"close");
 
-          const time = document.createElement("div");
-          time.className = "event-time";
-
-          // Время на час назад
-          const date = new Date(ev.timestamp);
-          date.setHours(date.getHours() - 1);
-          time.textContent = date.toLocaleString("ru-RU", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit"
+          const time=document.createElement("div");
+          time.className="event-time";
+          const date=new Date(ev.timestamp);
+          date.setHours(date.getHours()-1); // сдвиг на час назад
+          time.textContent=date.toLocaleString("ru-RU", {
+            year:"numeric", month:"2-digit", day:"2-digit",
+            hour:"2-digit", minute:"2-digit", second:"2-digit"
           });
 
-          const text = document.createElement("div");
-          text.className = "event-text";
-          text.textContent = "Дверь: " + (ev.door ? "Открыта" : "Закрыта");
+          const text=document.createElement("div");
+          text.className="event-text";
+          text.textContent="Дверь: "+(ev.door?"Открыта":"Закрыта");
 
           card.appendChild(time);
           card.appendChild(text);
           container.appendChild(card);
         });
 
-      } catch (err) {
-        document.getElementById("events").innerHTML =
-          "Ошибка загрузки данных.";
+      } catch(err) {
         console.error(err);
+        document.getElementById("events").innerHTML="Ошибка загрузки данных.";
       }
     }
 
     loadEvents();
-    setInterval(loadEvents, 3000);
+    setInterval(loadEvents,3000);
   </script>
 </body>
 </html>
