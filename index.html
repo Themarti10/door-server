@@ -77,7 +77,9 @@
           return;
         }
 
-        // Новые события будут добавляться в начало контейнера
+        // Сортировка по времени от новых к старым
+        data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
         data.forEach(ev => {
           const card = document.createElement("div");
           card.className = "event";
@@ -108,7 +110,7 @@
           card.appendChild(leftDiv);
           card.appendChild(tempText);
 
-          container.insertBefore(card, container.firstChild); // вставка в начало
+          container.appendChild(card); // добавляем после сортировки
         });
 
       } catch (err) {
