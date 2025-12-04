@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>События двери</title>
+  <title>События двери и температура</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
@@ -31,6 +31,9 @@
       border-radius: 10px;
       border-left: 5px solid #3a8ef6;
       box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     .event-time {
       font-size: 14px;
@@ -41,16 +44,23 @@
       font-size: 18px;
       font-weight: 500;
     }
-    .open {
-      border-left-color: #4caf50;
+    .door-status.open {
+      color: #4caf50;
+      font-weight: bold;
     }
-    .close {
-      border-left-color: #f44336;
+    .door-status.close {
+      color: #f44336;
+      font-weight: bold;
+    }
+    .temperature {
+      font-size: 16px;
+      color: #ffd54f;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <header>События двери</header>
+  <header>События двери и температура</header>
   <div id="events">Загрузка...</div>
 
   <script>
@@ -70,13 +80,12 @@
         // Новые события сверху
         data.reverse().forEach(ev => {
           const card = document.createElement("div");
-          const doorState = ev.door; // теперь ключ ev.door
-          card.className = "event " + (doorState === "Открыта" ? "open" : "close");
+          card.className = "event";
 
+          const leftDiv = document.createElement("div");
           const time = document.createElement("div");
           time.className = "event-time";
 
-          // Преобразуем ISO в локальное время
           const date = new Date(ev.timestamp);
           const options = { 
             year: 'numeric', month: 'long', day: 'numeric',
@@ -84,12 +93,21 @@
           };
           time.textContent = date.toLocaleString('ru-RU', options);
 
-          const text = document.createElement("div");
-          text.className = "event-text";
-          text.textContent = "Дверь: " + doorState;
+          const doorState = ev.door ? ev.door : "-";
+          const doorText = document.createElement("div");
+          doorText.className = "event-text door-status " + (doorState === "Открыта" ? "open" : doorState === "Закрыта" ? "close" : "");
+          doorText.textContent = "Дверь: " + doorState;
 
-          card.appendChild(time);
-          card.appendChild(text);
+          leftDiv.appendChild(time);
+          leftDiv.appendChild(doorText);
+
+          const tempText = document.createElement("div");
+          tempText.className = "temperature";
+          tempText.textContent = ev.temperature !== undefined ? ev.temperature.toFixed(1) + " °C" : "-";
+
+          card.appendChild(leftDiv);
+          card.appendChild(tempText);
+
           container.appendChild(card);
         });
 
