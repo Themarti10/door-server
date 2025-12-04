@@ -1,35 +1,37 @@
-// POST endpoint для ESP32
-app.post("/test", (req, res) => {
-  console.log("Получены данные от ESP32:", req.body);
+const express = require("express");
+const path = require("path");
 
-  if (firebaseEnabled && db) {
-    const { door, temperature } = req.body;
-    const timestamp = new Date().toISOString();
-    const event = { timestamp };
+const app = express();
+const port = process.env.PORT || 3000;
 
-    if (door !== undefined) event.door = door ? "Открыта" : "Закрыта";
-    if (temperature !== undefined) event.temperature = temperature;
+app.use(express.json());
+app.use(express.static(__dirname)); // отдаём файлы из корня
 
-    db.collection("door_events").add(event)
-      .then(() => console.log("Событие добавлено в Firestore:", event))
-      .catch(err => console.error("Ошибка записи в Firestore:", err));
-  }
+
+// Endpoint для ESP32
+app.post("/api", (req, res) => {
+  const event = req.body;
+  console.log("Получены данные от ESP32:", event);
+
+  // Сохраняем данные временно в массив (чтобы фронтенд мог их читать)
+  events.unshift({ ...event, timestamp: new Date().toISOString() });
 
   res.json({ status: "ok" });
 });
 
-// GET endpoint для фронтенда
-app.get("/events", async (req, res) => {
-  if (!firebaseEnabled || !db) return res.json([]);
+// Массив для хранения событий (локально, пока работает сервер)
+let events = [];
 
-  try {
-    const snapshot = await db.collection("door_events")
-                             .orderBy("timestamp", "desc")
-                             .get();
-    const events = snapshot.docs.map(doc => doc.data());
-    res.json(events);
-  } catch (err) {
-    console.error("Ошибка чтения из Firestore:", err);
-    res.status(500).json([]);
-  }
+// GET для фронтенда
+app.get("/events", (req, res) => {
+  res.json(events);
+});
+
+// Простейший GET для проверки сервера
+app.get("/", (req, res) => {
+  res.send("Server is running!");
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
