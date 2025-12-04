@@ -77,8 +77,8 @@
           return;
         }
 
-        // Новые события сверху
-        data.reverse().forEach(ev => {
+        // Новые события будут добавляться в начало контейнера
+        data.forEach(ev => {
           const card = document.createElement("div");
           card.className = "event";
 
@@ -108,7 +108,7 @@
           card.appendChild(leftDiv);
           card.appendChild(tempText);
 
-          container.appendChild(card);
+          container.insertBefore(card, container.firstChild); // вставка в начало
         });
 
       } catch (err) {
