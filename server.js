@@ -5,31 +5,30 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(express.static(__dirname)); // отдаём файлы из корня
+app.use(express.static(__dirname)); // отдаём все файлы из корня
 
+// Массив для хранения событий (локально, пока работает сервер)
+let events = [];
 
 // Endpoint для ESP32
 app.post("/api", (req, res) => {
   const event = req.body;
   console.log("Получены данные от ESP32:", event);
 
-  // Сохраняем данные временно в массив (чтобы фронтенд мог их читать)
+  // Добавляем новое событие в начало массива
   events.unshift({ ...event, timestamp: new Date().toISOString() });
 
   res.json({ status: "ok" });
 });
 
-// Массив для хранения событий (локально, пока работает сервер)
-let events = [];
-
-// GET для фронтенда
-app.get("/events", (req, res) => {
-  res.json(events);
+// GET для фронтенда: отдаём index.html
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// Простейший GET для проверки сервера
-app.get("/", (req, res) => {
-  res.send("Server is running!");
+// GET для списка событий
+app.get("/events", (req, res) => {
+  res.json(events);
 });
 
 app.listen(port, () => {
